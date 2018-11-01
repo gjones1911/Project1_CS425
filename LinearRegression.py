@@ -43,15 +43,17 @@ cont_dis = [0,    # 0 mpg
 # used to remove car names from data array
 cols_rmv = [8]
 
+# represents the data split (traingin, validation)
 size = [.75, .25]
+
 
 split_selection = list()
 
-limit = 15
-for x in range(0, limit):
+runs = 15
+for x in range(0, runs):
     split_selection.append(size)
 
-print('Number of Runs: ', limit)
+print('Number of Runs: ', runs)
 print("Data Split: ", split_selection[0])
 
 # get the data using data cleaner
@@ -59,4 +61,12 @@ print("Data Split: ", split_selection[0])
 # are attributes of a specific observations
 data_array = DataCleaner.data_cleaner("CarData.txt")
 
+# used to do Linear Regression.
+# Arguments are:
+#               data_array: The data array created with DataCleaner
+#               imputation: The users choice of imputation
+#               cont_dis: The array that represents which cols/attributes are continuous or discrete(0,1)
+#               cols_rmv: The columns the user would like to be removed from the data set here it is the car_name
+#               bad data signal: This will be used to determine if and what data points are missing
+#               split_selection: Array controlling how many tests are run and the split between test and validation sets
 Regression.perform_regression(list(data_array), imputation, cont_dis, cols_rmv, '?', 0, split_selection)

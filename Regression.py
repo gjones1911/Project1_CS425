@@ -184,7 +184,7 @@ def test_data_set_cod_a(w_l, dat_l, y_dat_l):
 
     for i in range(len(w_l)):
         current_cod_l = list()
-        # test the randomized sameple
+        # test the randomized sample
         for idx in range(len(dat_l)):
             gmodel = get_r_data(dat_l[idx], w_l[i])
             cod = np.around(calculate_cod(gmodel, y_dat_l[idx]), 12)
