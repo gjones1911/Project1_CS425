@@ -37,6 +37,18 @@ def getlinregmissingdata(regdata, baddic, w):
     return r
 
 
+def reg_lin_regresser(x, w):
+
+    y = list()
+
+    for entry in x:
+        y.append(entry*w[1] + w[0])
+
+    return y
+
+
+
+
 # uses linear regression to generate a slope(m) and intercept(b) value
 # for a line approximating the data
 # def reg_lin_regression_MSR(X, Y):
@@ -746,6 +758,7 @@ def regression_linear_regression(data_array, cont_dis, cls_rmv, sig, y_col, spli
 
     imp = 'Linear Regression Imputation:'
 
+    # use linear regression for imputation
     d_a, stat_a, x, y, x_n, y_n = DataManipulation.linear_regression_imputation(list(data_array), cont_dis, cls_rmv, sig, y_col)
 
     cod_r, n_cod_r, lse_r, n_lse_r, mse_r, n_mse_r = er_t(list(x), list(y), list(x_n), list(y_n), split_array)

@@ -1,6 +1,7 @@
 import numpy as np
 import Regression
 from numpy.core.multiarray import ndarray
+from matplotlib.pyplot import *
 
 # ----------------------------------------Data manipulation and searching-------------------------------
 
@@ -240,6 +241,8 @@ def average_imputation(data_array, cont_dis, cols_rmv, bad_sig, ind_col):
 
 # performs linear regression imputation on data array
 def linear_regression_imputation(data_array, cont_dis, cols_rmv, bad_sig, ind_col):
+
+
     bad_dat_dic = find_col_bad_data(data_array.copy(), bad_sig)
 
     # remove the column for car name
@@ -250,26 +253,50 @@ def linear_regression_imputation(data_array, cont_dis, cols_rmv, bad_sig, ind_co
 
     dat_a = list(data_array)
 
+    # x = column_getter(dat_a, )
+
     # remove the rows found in the list at key 3 in the dictionary
     d_a_known = remove_row(list(dat_a), bad_dat_dic[3])
 
+    x = column_getter(d_a_known, 4)
+
+    # print('hopefully the weight array is:')
+    # print(x)
+    # print(format('\n'))
+
     # split the data into a independent array(X) and the dependent array(y)
     # where Y is the horse power column
+    # through the find first method found that weight (3)leads to the best mse error
     x_a_lr_i, y_a_lr_i = x_y_getter(list(d_a_known), 3)
 
+    # ------------------------Find the best column
     # Use the find_first method to find the column that leads to the lowest mean square error (mse)
     # and return the column number (min_col), the minimum mean square error (min_mse), and the best column
     # it self
-    min_col, min_mse, best_col = Regression.find_first(list(x_a_lr_i), list(y_a_lr_i), list([.60, .40]))
+    # min_col, min_mse, best_col = Regression.find_first(list(x_a_lr_i), list(y_a_lr_i), list([.60, .40]))
+    #print(format('\n'))
+    #print('The minimum column is {:d}'.format(min_col[0]))
+    #print(format('\n'))
 
     # hp_array = DataProcessor.column_getter(list(y_a_lr_i), attribute_label_array.index('Horse Power'))
     hp_array = list(y_a_lr_i)
 
     # solve for the parameters
-    w_imp = Regression.multi_linear_regressor(x_a_lr_i, hp_array)
+    # w_imp = Regression.multi_linear_regressor(x_a_lr_i, hp_array)
+
+    w_imp = Regression.linear_calculation_for_w(x, hp_array)
 
     # use the parameter array to calculate values for the missing data points
-    rt = Regression.getlinregmissingdata(list(data_array), bad_dat_dic, w_imp)
+    #rt = Regression.getlinregmissingdata(list(data_array), bad_dat_dic, w_imp)
+
+    rt = Regression.reg_lin_regresser(x, w_imp)
+
+    figure(1)
+    title('Weight vs. Horse Power')
+    plot(x, rt, 'r--', label='weight vs regression')
+    plot(x, y_a_lr_i, 'o', label='c label')
+    legend(['regression data', 'raw data'])
+    show()
 
     # replace missing values in original data array with the estimates found through
     # regression
