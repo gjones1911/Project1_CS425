@@ -2,6 +2,7 @@ import numpy as np
 # for storing dictionaries
 import operator
 import DataManipulation
+from matplotlib.pyplot import *
 
 # ----------------------------------------------Regression Functions----------------------------------------------
 
@@ -385,8 +386,6 @@ def train_model_lse2(param_tr_val_a):
     ret_val = [[lse_tr, lses_best_tr, t_b_lse_t, ret_tuple_trn[0][0], lses_best_tr[0]],
                [lse_val, lses_best_val, t_b_lse_v, ret_tuple_val[0][0], lses_best_val[0]],
                [tr_avg_lse_avg_b, val_avg_lse_avg_b]]
-
-
     return ret_val
 
 
@@ -557,12 +556,6 @@ def forward_selector_test(x_data, y_data, split):
     # find the first variable  array to add to F as well its mean square error
     min_col, min_mse, best_col = find_first(x_data.copy(), y_data.copy(), split)
 
-    print(y_data)
-
-    print('First column')
-    print(attribute_labels[min_col[0]])
-    print(format("\n"))
-
     cols_f.append(min_col[0])
 
     # used to ignore column 1
@@ -632,9 +625,6 @@ def forward_selector_test(x_data, y_data, split):
             cols_f.append(addcol[0])
             if len(f) == col_size + 1:
                 break
-        print('using Attributes: ')
-        for i in range(len(cols_f)):
-            print(attribute_labels[cols_f[i]])
 
     return f, mininmum_mse[0], cols_f
 
@@ -685,6 +675,17 @@ def regression_discard_fs(data_array, cont_dis, cols_rmv, sig, y_col, split_arra
     print('-----------------------------------')
     print('Using Discard Imputation with Forward Selection Dimension Reduction')
     print('-----------------------------------')
+
+    attribute_labels = ['mpg',            # 0
+                        'Cylinders',      # 1
+                        'Displacement',   # 2
+                        'Horse Power',    # 3
+                        'Weight',         # 4
+                        'Acceleration',   # 5
+                        'Model Year',     # 6
+                        'Origin',         # 7
+                        'Car Type']       # 8
+
     imp = 'Discard Imputation:'
     d_array, stat_a, x, y, x_n, y_n = DataManipulation.discard_imputation(list(data_array), cont_dis, cols_rmv, sig,y_col)
 
@@ -692,6 +693,8 @@ def regression_discard_fs(data_array, cont_dis, cols_rmv, sig, y_col, split_arra
     f_n, min_mse_n, cols_f_n = forward_selector_test(list(x_n), list(y_n), split_array[0])
 
     print('F is using ' + str(len(F[0]) - 1) + ' attributes')
+    for i in range(len(cols_f)):
+        print(attribute_labels[cols_f[i]])
 
     cod_r, n_cod_r, lse_r, n_lse_r, mse_r, n_mse_r = er_t(list(F), list(y), list(f_n), list(y_n), split_array)
 
@@ -726,8 +729,18 @@ def regression_average(data_array, cont_dis, cols_rmv, sig, y_col, split_array):
 # perfomre regression with
 def regression_average_fs(data_array, cont_dis, cols_rmv, sig, y_col, split_array):
     print('-----------------------------------')
-    print('Using Average Imputation with Forward Felection Dimension Reduction')
+    print('Using Average Imputation with Forward Selection Dimension Reduction')
     print('-----------------------------------')
+
+    attribute_labels = ['mpg',           # 0
+                        'Cylinders',     # 1
+                        'Displacement',  # 2
+                        'Horse Power',   # 3
+                        'Weight',        # 4
+                        'Acceleration',  # 5
+                        'Model Year',    # 6
+                        'Origin',        # 7
+                        'Car Type']      # 8
 
     imp = 'Average Imputation:'
 
@@ -737,13 +750,15 @@ def regression_average_fs(data_array, cont_dis, cols_rmv, sig, y_col, split_arra
     f_n, min_mse_n, cols_f_n = forward_selector_test(list(x_n), list(y_n), split_array[0])
 
     print('F is using ' + str(len(F[0]) - 1) + ' attributes')
-    print('F normalized is using ' + str(len(f_n[0]) - 1) + ' attributes')
+    for i in range(len(cols_f)):
+        print(attribute_labels[cols_f[i]])
 
     cod_r, n_cod_r, lse_r, n_lse_r, mse_r, n_mse_r = er_t(list(F), list(y), list(f_n), list(y_n), split_array)
 
     # show_results(imp, error, cod_result, lse_result, mse_result)
     print('Unnormalized Data:')
     show_results(imp, cod_r, lse_r, mse_r)
+    print('')
     print('Normalized Data:')
     show_results(imp, n_cod_r, n_lse_r, n_mse_r)
 
@@ -759,7 +774,7 @@ def regression_linear_regression(data_array, cont_dis, cls_rmv, sig, y_col, spli
     imp = 'Linear Regression Imputation:'
 
     # use linear regression for imputation
-    d_a, stat_a, x, y, x_n, y_n = DataManipulation.linear_regression_imputation(list(data_array), cont_dis, cls_rmv, sig, y_col)
+    d_a, stat_a, x, y, x_n, y_n, xr, rt, y_ar = DataManipulation.linear_regression_imputation(list(data_array), cont_dis, cls_rmv, sig, y_col)
 
     cod_r, n_cod_r, lse_r, n_lse_r, mse_r, n_mse_r = er_t(list(x), list(y), list(x_n), list(y_n), split_array)
 
@@ -768,31 +783,61 @@ def regression_linear_regression(data_array, cont_dis, cls_rmv, sig, y_col, spli
     print('Normalized Data:')
     show_results(imp, n_cod_r, n_lse_r, n_mse_r)
 
+    figure(1)
+    title('Weight vs. Horse Power')
+    plot(xr, rt, 'r--', label='weight vs regression')
+    plot(xr, y_ar, 'o', label='c label')
+    xlabel('Car Weight')
+    ylabel('Horse Power')
+    legend(['regression data', 'raw data'])
+    show()
+
     return
 
 
 # perfomre regression with
 def regression_linear_regression_fs(data_array, cont_dis, cls_rmv, sig, y_col, split_array):
     print('-----------------------------------')
-    print('Using Linear Regression Imputation')
+    print('Using Linear Regression Imputation with Forward Selection Dimension Reduction')
     print('-----------------------------------')
 
-    imp = 'Linear Regression Imputation:'
+    attribute_labels = ['mpg',           # 0
+                        'Cylinders',     # 1
+                        'Displacement',  # 2
+                        'Horse Power',   # 3
+                        'Weight',        # 4
+                        'Acceleration',  # 5
+                        'Model Year',    # 6
+                        'Origin',        # 7
+                        'Car Type']      # 8
 
-    d_a, stat_a, x, y, x_n, y_n = DataManipulation.linear_regression_imputation(list(data_array), cont_dis, cls_rmv, sig, y_col)
+    imp = 'Linear Regression Imputation with Forward Selection:'
+
+    d_a, stat_a, x, y, x_n, y_n, xr, rt, y_ar = DataManipulation.linear_regression_imputation(list(data_array), cont_dis, cls_rmv, sig, y_col)
 
     F, min_mse, cols_f = forward_selector_test(list(x), list(y), split_array[0])
     f_n, min_mse_n, cols_f_n = forward_selector_test(list(x_n), list(y_n), split_array[0])
 
     print('F is using ' + str(len(F[0]) - 1) + ' attributes')
-    print('F normalized is using ' + str(len(f_n[0]) - 1) + ' attributes')
+    for i in range(len(cols_f)):
+        print(attribute_labels[cols_f[i]])
 
     cod_r, n_cod_r, lse_r, n_lse_r, mse_r, n_mse_r = er_t(list(F), list(y), list(f_n), list(y_n), split_array)
 
     print('Unnormalized Data:')
     show_results(imp, cod_r, lse_r, mse_r)
+    print('')
     print('Normalized Data:')
     show_results(imp, n_cod_r, n_lse_r, n_mse_r)
+
+    figure(1)
+    title('Weight vs. Horse Power')
+    plot(xr, rt, 'r--', label='weight vs regression')
+    plot(xr, y_ar, 'o', label='c label')
+    xlabel('Car Weight')
+    ylabel('Horse Power')
+    legend(['regression data', 'raw data'])
+    show()
 
     return
 

@@ -291,18 +291,25 @@ def linear_regression_imputation(data_array, cont_dis, cols_rmv, bad_sig, ind_co
 
     rt = Regression.reg_lin_regresser(x, w_imp)
 
+    '''
     figure(1)
     title('Weight vs. Horse Power')
     plot(x, rt, 'r--', label='weight vs regression')
     plot(x, y_a_lr_i, 'o', label='c label')
     legend(['regression data', 'raw data'])
     show()
+    '''
 
     # replace missing values in original data array with the estimates found through
     # regression
     imputation_data = replace_bad_data_vec(list(data_array), bad_dat_dic, rt)
 
-    return get_fixed_data_stats_x_y_xn_yn(imputation_data, cont_dis, ind_col)
+    d_a, stat_a, xd, yd, x_n, y_n =get_fixed_data_stats_x_y_xn_yn(imputation_data,cont_dis, ind_col)
+
+
+    #return get_fixed_data_stats_x_y_xn_yn(imputation_data, cont_dis, ind_col)
+    #return get_fixed_data_stats_x_y_xn_yn(imputation_data, cont_dis, ind_col), x, rt, y_a_lr_i
+    return d_a, stat_a, xd, yd, x_n, y_n, x, rt, y_a_lr_i
 
 
 # -------------------------------Data Analysis-----------------------------------------------
